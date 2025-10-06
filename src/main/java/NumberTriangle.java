@@ -92,8 +92,23 @@ Read the provided NumberTriange.java file to understand the definition of a numb
      *
      */
     public int retrieve(String path) {
-        // TODO implement this method
-        return -1;
+        if (Objects.equals(path, "")) {
+            return root;
+        } else {
+            NumberTriangle currentTree = this;
+            System.out.println(root);
+
+            for (int i = 0; i < path.length(); i++) {
+                char c = path.charAt(i);
+
+                if (c == 'l') {
+                    currentTree = currentTree.left;
+                } else if (c == 'r') {
+                    currentTree = currentTree.right;
+                }
+            }
+            return currentTree.getRoot();
+        }
     }
 
     /** Read in the NumberTriangle structure from a file.
