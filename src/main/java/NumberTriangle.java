@@ -1,4 +1,6 @@
 import java.io.*;
+import java.util.ArrayList;
+import java.util.Objects;
 
 /**
  * This is the provided NumberTriangle class to be used in this coding task.
@@ -78,6 +80,8 @@ public class NumberTriangle {
      * the root of the NumberTriangle.
      *
      * You can decide if you want to use a recursive or an iterative approach in your solution.
+
+Read the provided NumberTriange.java file to understand the definition of a number triangle and what methods and variables we have defined to represent the structure.
      *
      * You can assume that:
      *      the length of path is less than the height of this NumberTriangle structure.
@@ -109,8 +113,7 @@ public class NumberTriangle {
         InputStream inputStream = NumberTriangle.class.getClassLoader().getResourceAsStream(fname);
         BufferedReader br = new BufferedReader(new InputStreamReader(inputStream));
 
-
-        // TODO define any variables that you want to use to store things
+        ArrayList<ArrayList<Integer>> triangleNums = new ArrayList<>();
 
         // will need to return the top of the NumberTriangle,
         // so might want a variable for that.
@@ -118,17 +121,73 @@ public class NumberTriangle {
 
         String line = br.readLine();
         while (line != null) {
-
-            // remove when done; this line is included so running starter code prints the contents of the file
-            System.out.println(line);
-
-            // TODO process the line
+            ArrayList<Integer> triangleRow = new ArrayList<>();
+            String[] split = line.split(" ");
+            for (String num : split) {
+                triangleRow.add(Integer.parseInt(num));
+            }
+            if (triangleRow.size() == 1) {
+                top = new NumberTriangle(triangleRow.get(0));
+            }
+            triangleNums.add(triangleRow);
 
             //read the next line
             line = br.readLine();
         }
         br.close();
+        assert top != null;
+        top.generateTriangle(triangleNums);
         return top;
+    }
+
+    // Recursive Helper
+    public void generateTriangle(ArrayList<ArrayList<Integer>> triangleNums) {
+
+        ArrayList<NumberTriangle> currLayer = new ArrayList<NumberTriangle>();
+        currLayer.add(this);
+
+        for (int rowNum = 0; rowNum < triangleNums.size() - 1; rowNum++) {
+            ArrayList<Integer> currRow = triangleNums.get(rowNum);
+            int rowSize = currRow.size();
+
+            ArrayList<Integer> nextRow = triangleNums.get(rowNum + 1);
+            NumberTriangle holdover = null;
+
+            ArrayList<NumberTriangle> newCurrLayer = new ArrayList<NumberTriangle>();
+
+            for (int i = 0; i < rowSize; i++) {
+                // Get current
+                NumberTriangle rootTriangle = currLayer.get(i);
+
+                // Generate left
+                NumberTriangle leftTriangle;
+                if (i == 0) {
+                    leftTriangle = new NumberTriangle(nextRow.get(i));
+                } else {
+                    leftTriangle = holdover;
+                }
+
+                // Generate right
+                NumberTriangle rightTriangle = new NumberTriangle(nextRow.get(i + 1));
+
+                // Set left, right
+                rootTriangle.setLeft(leftTriangle);
+                rootTriangle.setRight(rightTriangle);
+
+                if (i < rowSize - 1) {
+                    holdover = rightTriangle;
+                }
+
+                if (i == 0) {
+                    newCurrLayer.add(leftTriangle);
+                }
+                newCurrLayer.add(rightTriangle);
+            }
+
+            // Replace currLayer
+            currLayer.clear();
+            currLayer.addAll(newCurrLayer);
+        }
     }
 
     public static void main(String[] args) throws IOException {
